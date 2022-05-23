@@ -49,3 +49,19 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreateFile)(BOOL mem, const void* file, 
 	}
 	return 0;
 }
+
+HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QWORD length, DWORD flags) {
+	BASS_CHANNELINFO info;
+	MEMORY_STREAM* stream;
+	BUFFER* buffer;
+	if (BASS_ChannelGetInfo(handle, &info)) {
+		buffer = read_stream_buffer((const wchar_t*)info.filename, handle, offset, length);
+		if (buffer) {
+			stream = memory_stream_create((const wchar_t*)info.filename, buffer, &BASS_StreamCreateFileUser, flags);
+			if (stream) {
+				return stream->handle;
+			}
+		}
+	}
+	return 0;
+}

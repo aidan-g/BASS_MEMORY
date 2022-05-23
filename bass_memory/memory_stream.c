@@ -69,7 +69,8 @@ MEMORY_STREAM* memory_stream_create(const wchar_t* file, BUFFER* buffer, MEMORY_
 #if _DEBUG
 		printf("Failed to create stream.\n");
 #endif
-		memory_stream_free(stream);
+		//TODO: It looks like memory_stream_close has already been called if the handler fails.
+		//memory_stream_free(stream);
 		return NULL;
 	}
 	return stream;

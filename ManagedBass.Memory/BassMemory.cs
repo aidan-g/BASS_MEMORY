@@ -84,5 +84,13 @@ namespace ManagedBass.Memory
         {
             return BASS_MEMORY_StreamCreateFile(false, File, Offset, Length, Flags | BassFlags.Unicode);
         }
+
+        [DllImport(DllName)]
+        static extern int BASS_MEMORY_StreamCreate(int handle, long offset, long length, BassFlags flags);
+
+        public static int CreateStream(int handle, long Offset = 0, long Length = 0, BassFlags Flags = BassFlags.Default)
+        {
+            return BASS_MEMORY_StreamCreate(handle, Offset, Length, Flags | BassFlags.Unicode);
+        }
     }
 }

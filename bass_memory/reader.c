@@ -46,6 +46,13 @@ BOOL populate_file_buffer(FILE* file_handle, const BUFFER* buffer) {
 			free(file_buffer);
 			return TRUE;
 		}
+		if (position + length > buffer->length) {
+#if _DEBUG
+			printf("Buffer capacity exceeded.");
+#endif
+			free(file_buffer);
+			return TRUE;
+		}
 		buffer_write(buffer, position, length, file_buffer);
 		position += length;
 	} while (TRUE);
@@ -65,7 +72,7 @@ BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 		printf("Error opening file: %s\n", error);
 #endif
 		return NULL;
-}
+	}
 	file_length = get_file_length(file_handle);
 	if (file_length == -1) {
 #if _DEBUG
@@ -83,6 +90,62 @@ BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 		}
 	}
 	fclose(file_handle);
+	if (buffer) {
+		cache_add(file, buffer);
+	}
+	return buffer;
+}
+
+BOOL populate_stream_buffer(HSTREAM handle, const BUFFER* buffer) {
+	DWORD length;
+	QWORD position = 0;
+	void* stream_buffer = malloc(BUFFER_BLOCK_SIZE);
+	if (!stream_buffer) {
+#if _DEBUG
+		printf("Could not allocate temp buffer.\n");
+#endif
+		return FALSE;
+	}
+	do {
+		length = BASS_ChannelGetData(handle, stream_buffer, BUFFER_BLOCK_SIZE);
+		if (length == BASS_STREAMPROC_END || length == BASS_ERROR_UNKNOWN || length <= 0) {
+			free(stream_buffer);
+			return TRUE;
+		}
+		if (position + length > buffer->length) {
+#if _DEBUG
+			printf("Buffer capacity exceeded.");
+#endif
+			free(stream_buffer);
+			return TRUE;
+		}
+		buffer_write(buffer, position, length, stream_buffer);
+		position += length;
+	} while (TRUE);
+}
+
+BUFFER* read_stream_buffer(const wchar_t* file, HSTREAM handle, QWORD offset, QWORD length) {
+	BUFFER* buffer;
+	QWORD stream_length;
+	if (cache_acquire(file, &buffer)) {
+		return buffer;
+	}
+	stream_length = BASS_ChannelGetLength(handle, BASS_POS_BYTE);
+	if (stream_length == -1) {
+#if _DEBUG
+		printf("Could not determine stream length.\n");
+#endif
+		buffer = NULL;
+	}
+	else {
+		buffer = buffer_create(stream_length);
+		if (buffer) {
+			if (!populate_stream_buffer(handle, buffer)) {
+				buffer_free(buffer);
+				buffer = NULL;
+			}
+		}
+	}
 	if (buffer) {
 		cache_add(file, buffer);
 	}
