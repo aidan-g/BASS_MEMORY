@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_memory", "bass_memory\bass_memory.vcxproj", "{E612BC45-E1B1-4F71-8DCC-60ECC41B7596}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedBass.Memory", "ManagedBass.Memory\ManagedBass.Memory.csproj", "{482EF36A-AA90-43A7-8AFA-D71B8599FD1A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E612BC45-E1B1-4F71-8DCC-60ECC41B7596} = {E612BC45-E1B1-4F71-8DCC-60ECC41B7596}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedBass.Memory.Tests", "ManagedBass.Memory.Tests\ManagedBass.Memory.Tests.csproj", "{F53465C6-ECEE-45EE-B130-56F32DB6ED17}"
 EndProject

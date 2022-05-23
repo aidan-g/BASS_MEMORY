@@ -54,7 +54,7 @@ const BASS_FILEPROCS memory_stream_procs = {
 	&memory_stream_seek
 };
 
-MEMORY_STREAM* memory_stream_create(const wchar_t* file, BUFFER* buffer, MEMORY_STREAM_HANDLER* const handler, DWORD flags) {
+MEMORY_STREAM* memory_stream_create(const wchar_t* file, BUFFER* buffer, MEMORY_STREAM_HANDLER* handler, DWORD flags) {
 	MEMORY_STREAM* stream = calloc(sizeof(MEMORY_STREAM), 1);
 	if (!stream) {
 #if _DEBUG
@@ -62,14 +62,15 @@ MEMORY_STREAM* memory_stream_create(const wchar_t* file, BUFFER* buffer, MEMORY_
 #endif
 		return stream;
 	}
-	wcscpy((wchar_t*)stream->file, file);
+	wcscpy_s((wchar_t*)stream->file, sizeof(stream->file), file);
 	stream->buffer = buffer;
 	stream->handle = handler(STREAMFILE_NOBUFFER, flags, &memory_stream_procs, stream);
 	if (!stream->handle) {
 #if _DEBUG
 		printf("Failed to create stream.\n");
 #endif
-		memory_stream_free(stream);
+		//TODO: It looks like memory_stream_close has already been called if the handler fails.
+		//memory_stream_free(stream);
 		return NULL;
 	}
 	return stream;

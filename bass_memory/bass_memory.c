@@ -49,3 +49,21 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreateFile)(BOOL mem, const void* file, 
 	}
 	return 0;
 }
+
+HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QWORD length, DWORD flags) {
+	MEMORY_STREAM* stream;
+	BUFFER* buffer;
+	wchar_t file[MAX_PATH + 1];
+	WAVE_HEADER wave_header;
+	if (create_wave_header(handle, &wave_header)) {
+		swprintf_s(file, sizeof(file), L"%u.wav", handle);
+		buffer = read_stream_buffer((const wchar_t*)file, wave_header, handle, offset, length);
+		if (buffer) {
+			stream = memory_stream_create((const wchar_t*)file, buffer, &BASS_StreamCreateFileUser, flags);
+			if (stream) {
+				return stream->handle;
+			}
+		}
+	}
+	return 0;
+}
