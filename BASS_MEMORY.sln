@@ -7,10 +7,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_memory", "bass_memory\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedBass.Memory", "ManagedBass.Memory\ManagedBass.Memory.csproj", "{482EF36A-AA90-43A7-8AFA-D71B8599FD1A}"
 	ProjectSection(ProjectDependencies) = postProject
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828} = {AE321E41-22B6-48BB-B473-DAEE59C2D828}
 		{E612BC45-E1B1-4F71-8DCC-60ECC41B7596} = {E612BC45-E1B1-4F71-8DCC-60ECC41B7596}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedBass.Memory.Tests", "ManagedBass.Memory.Tests\ManagedBass.Memory.Tests.csproj", "{F53465C6-ECEE-45EE-B130-56F32DB6ED17}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_memory_dsd", "bass_memory_dsd\bass_memory_dsd.vcxproj", "{AE321E41-22B6-48BB-B473-DAEE59C2D828}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,14 @@ Global
 		{F53465C6-ECEE-45EE-B130-56F32DB6ED17}.Release|x64.Build.0 = Release|Any CPU
 		{F53465C6-ECEE-45EE-B130-56F32DB6ED17}.Release|x86.ActiveCfg = Release|Any CPU
 		{F53465C6-ECEE-45EE-B130-56F32DB6ED17}.Release|x86.Build.0 = Release|Any CPU
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Debug|x64.ActiveCfg = Debug|x64
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Debug|x64.Build.0 = Debug|x64
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Debug|x86.ActiveCfg = Debug|Win32
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Debug|x86.Build.0 = Debug|Win32
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Release|x64.ActiveCfg = Release|x64
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Release|x64.Build.0 = Release|x64
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Release|x86.ActiveCfg = Release|Win32
+		{AE321E41-22B6-48BB-B473-DAEE59C2D828}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

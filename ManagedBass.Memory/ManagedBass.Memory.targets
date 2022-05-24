@@ -3,5 +3,8 @@
 		<None Include="$(MSBuildThisFileDirectory)\$(Platform)\bass_memory.dll" Link="$(Platform)\bass_memory.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Include="$(MSBuildThisFileDirectory)\$(Platform)\bass_memory_dsd.dll" Link="$(Platform)\bass_memory_dsd.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

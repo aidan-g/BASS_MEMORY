@@ -37,10 +37,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="..\lib\x64\bassdsd.dll" Link="x64\bassdsd.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="..\lib\x86\bassdsd.dll" Link="x86\bassdsd.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="..\Media\01 Botanical Dimensions.m4a" Link="Media\01 Botanical Dimensions.m4a">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Include="..\Media\02 Outer Shpongolia.m4a" Link="Media\02 Outer Shpongolia.m4a">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="..\Media\01 Sample.dsf" Link="Media\01 Sample.dsf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

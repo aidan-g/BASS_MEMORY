@@ -41,6 +41,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="..\lib\x64\bass_memory_dsd.dll" Link="x64\bass_memory_dsd.dll" PackagePath="build\x64">
+			<Pack>true</Pack>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="..\lib\x86\bass_memory_dsd.dll" Link="x86\bass_memory_dsd.dll" PackagePath="build\x86">
+			<Pack>true</Pack>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="ManagedBass.Memory.targets" PackagePath="build">
 			<pack>true</pack>
 		</None>
