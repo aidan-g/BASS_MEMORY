@@ -33,7 +33,7 @@ BOOL cache_add(const wchar_t* file, const BUFFER* buffer) {
 			continue;
 		}
 		//Initialise the entry.
-		wcscpy((wchar_t*)entries[position].file, file);
+		wcscpy_s((wchar_t*)entries[position].file, sizeof(entries[position].file), file);
 		entries[position].count = 1;
 		entries[position].buffer = buffer;
 		return TRUE;
@@ -64,7 +64,7 @@ BOOL cache_release(const wchar_t* file) {
 	entries[position].count--;
 	if (!entries[position].count) {
 		//If the count is zero then clear the entry.
-		wcscpy((wchar_t*)entries[position].file, L"");
+		wcscpy_s((wchar_t*)entries[position].file, sizeof(entries[position].file), L"");
 		entries[position].buffer = NULL;
 		return TRUE;
 	}

@@ -8,6 +8,9 @@
 void CALLBACK memory_stream_close(void* user) {
 	MEMORY_STREAM* stream = user;
 	if (cache_release(stream->file)) {
+#if _DEBUG
+		printf("The last handle to buffer \"%s\" was released, freeing it.\n", stream->file);
+#endif
 		buffer_free(stream->buffer);
 		stream->buffer = NULL;
 	}

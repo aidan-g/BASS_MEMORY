@@ -6,7 +6,8 @@ QWORD get_file_length(FILE* file_handle) {
 	QWORD length;
 	if (fseek(file_handle, 0L, SEEK_END) != 0) {
 #if _DEBUG
-		char* error = strerror(errno);
+		char error[256];
+		strerror_s(error, sizeof(error), errno);
 		printf("Error seeking file: %s\n", error);
 #endif
 		return -1;
@@ -14,7 +15,8 @@ QWORD get_file_length(FILE* file_handle) {
 	length = ftell(file_handle);
 	if (fseek(file_handle, 0L, SEEK_SET) != 0) {
 #if _DEBUG
-		char* error = strerror(errno);
+		char error[256];
+		strerror_s(error, sizeof(error), errno);
 		printf("Error seeking file: %s\n", error);
 #endif
 		return -1;
@@ -35,7 +37,8 @@ BOOL populate_file_buffer(FILE* file_handle, QWORD position, const BUFFER* buffe
 		length = fread(file_buffer, sizeof(BYTE), BUFFER_BLOCK_SIZE, file_handle);
 		if (ferror(file_handle)) {
 #if _DEBUG
-			char* error = strerror(errno);
+			char error[256];
+			strerror_s(error, sizeof(error), errno);
 			printf("Error opening file: %s\n", error);
 #endif
 			free(file_buffer);
@@ -64,10 +67,11 @@ BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 	if (cache_acquire(file, &buffer)) {
 		return buffer;
 	}
-	file_handle = _wfopen(file, L"rb");
+	_wfopen_s(&file_handle, file, L"rb");
 	if (!file_handle) {
 #if _DEBUG
-		char* error = strerror(errno);
+		char error[256];
+		strerror_s(error, sizeof(error), errno);
 		printf("Error opening file: %s\n", error);
 #endif
 		return NULL;

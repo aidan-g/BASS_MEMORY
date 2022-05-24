@@ -98,5 +98,84 @@ namespace ManagedBass.Memory.Tests
                 Assert.IsTrue(Bass.Free());
             }
         }
+
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Float)]
+        public void Test003(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            Assert.IsTrue(Loader.Load("bass"));
+            Assert.IsTrue(Bass.Init());
+            Assert.IsTrue(BassMemory.Init());
+
+            try
+            {
+                var sourceChannels = new int[10];
+                for (var a = 0; a < 10; a++)
+                {
+                    sourceChannels[a] = BassMemory.CreateStream(fileName, Flags: flags);
+                    if (sourceChannels[a] == 0)
+                    {
+                        Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
+                    }
+                }
+
+                for (var a = 0; a < 10; a++)
+                {
+                    Assert.IsTrue(Bass.StreamFree(sourceChannels[a]));
+                }
+            }
+            finally
+            {
+                Assert.IsTrue(BassMemory.Free());
+                Assert.IsTrue(Bass.Free());
+            }
+        }
+
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Float)]
+        public void Test004(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            Assert.IsTrue(Loader.Load("bass"));
+            Assert.IsTrue(Bass.Init());
+            Assert.IsTrue(BassMemory.Init());
+            try
+            {
+                var sourceChannel = Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+                if (sourceChannel == 0)
+                {
+                    Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
+                }
+
+                var sourceChannels = new int[10];
+                for (var a = 0; a < 10; a++)
+                {
+                    sourceChannels[a] = BassMemory.CreateStream(sourceChannel, Flags: flags);
+                    if (sourceChannels[a] == 0)
+                    {
+                        Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
+                    }
+                }
+
+                for (var a = 0; a < 10; a++)
+                {
+                    Assert.IsTrue(Bass.StreamFree(sourceChannels[a]));
+                }
+            }
+            finally
+            {
+                Assert.IsTrue(BassMemory.Free());
+                Assert.IsTrue(Bass.Free());
+            }
+        }
     }
 }
