@@ -93,6 +93,14 @@ namespace ManagedBass.Memory
             return BASS_MEMORY_StreamCreate(handle, Offset, Length, Flags | BassFlags.Unicode);
         }
 
+        [DllImport(DllName)]
+        static extern long BASS_MEMORY_Usage();
+
+        public static long Usage()
+        {
+            return BASS_MEMORY_Usage();
+        }
+
         public class Dsd
         {
             const string DllName = "bass_memory_dsd";
@@ -176,11 +184,11 @@ namespace ManagedBass.Memory
             }
 
             [DllImport(DllName)]
-            static extern int BASS_MEMORY_DSD_StreamCreate(int handle, long offset, long length, BassFlags flags);
+            static extern long BASS_MEMORY_DSD_Usage();
 
-            public static int CreateStream(int handle, long Offset = 0, long Length = 0, BassFlags Flags = BassFlags.Default)
+            public static long Usage()
             {
-                return BASS_MEMORY_DSD_StreamCreate(handle, Offset, Length, Flags | BassFlags.Unicode);
+                return BASS_MEMORY_DSD_Usage();
             }
         }
     }

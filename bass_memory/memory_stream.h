@@ -2,6 +2,7 @@
 
 typedef struct {
 	const wchar_t file[MAX_PATH + 1];
+	DWORD offset;
 	QWORD position;
 	BUFFER* buffer;
 	DWORD handle;

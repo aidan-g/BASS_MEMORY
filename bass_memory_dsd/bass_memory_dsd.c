@@ -5,6 +5,7 @@
 #include "../bass/bassdsd.h"
 
 #include "bass_memory_dsd.h"
+#include "../bass_memory/cache.h"
 #include "../bass_memory/memory_stream.h"
 #include "../bass_memory/reader.h"
 
@@ -56,20 +57,6 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_DSD_StreamCreateFile)(BOOL mem, const void* fi
 	return 0;
 }
 
-HSTREAM BASSMEMORYDEF(BASS_MEMORY_DSD_StreamCreate)(HSTREAM handle, QWORD offset, QWORD length, DWORD flags) {
-	MEMORY_STREAM* stream;
-	BUFFER* buffer;
-	wchar_t file[MAX_PATH + 1];
-	WAVE_HEADER wave_header;
-	if (create_wave_header(handle, &wave_header)) {
-		swprintf_s(file, sizeof(file), L"%u.wav", handle);
-		buffer = read_stream_buffer((const wchar_t*)file, wave_header, handle, offset, length);
-		if (buffer) {
-			stream = memory_stream_create((const wchar_t*)file, buffer, &_BASS_DSD_StreamCreateFileUser, flags);
-			if (stream) {
-				return stream->handle;
-			}
-		}
-	}
-	return 0;
+QWORD BASSMEMORYDEF(BASS_MEMORY_DSD_Usage)() {
+	return cache_size();
 }

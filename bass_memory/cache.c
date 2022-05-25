@@ -8,7 +8,7 @@ typedef struct {
 	const BUFFER* buffer;
 } ENTRY;
 
-static ENTRY entries[ENTRIES];
+static ENTRY entries[ENTRIES] = { 0 };
 
 BOOL cache_entry(const wchar_t* file, DWORD* const index) {
 	DWORD position;
@@ -69,4 +69,16 @@ BOOL cache_release(const wchar_t* file) {
 		return TRUE;
 	}
 	return FALSE;
+}
+
+QWORD cache_size() {
+	DWORD position;
+	QWORD size = 0;
+	for (position = 0; position < ENTRIES; position++) {
+		if (!entries[position].count || !entries[position].buffer) {
+			continue;
+		}
+		size += entries[position].buffer->length;
+	}
+	return size;
 }

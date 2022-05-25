@@ -36,7 +36,6 @@
     <ClInclude Include="..\bass_memory\cache.h" />
     <ClInclude Include="..\bass_memory\memory_stream.h" />
     <ClInclude Include="..\bass_memory\reader.h" />
-    <ClInclude Include="..\bass_memory\wave_header.h" />
     <ClInclude Include="bass_memory_dsd.h" />
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +43,6 @@
     <ClCompile Include="..\bass_memory\cache.c" />
     <ClCompile Include="..\bass_memory\memory_stream.c" />
     <ClCompile Include="..\bass_memory\reader.c" />
-    <ClCompile Include="..\bass_memory\wave_header.c" />
     <ClCompile Include="bass_memory_dsd.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

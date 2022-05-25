@@ -3,6 +3,7 @@
 #endif
 
 #include "bass_memory.h"
+#include "cache.h"
 #include "memory_stream.h"
 #include "reader.h"
 
@@ -66,4 +67,8 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QW
 		}
 	}
 	return 0;
+}
+
+QWORD BASSMEMORYDEF(BASS_MEMORY_Usage)() {
+	return cache_size();
 }
