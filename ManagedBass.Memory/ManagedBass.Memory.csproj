@@ -4,9 +4,16 @@
 		<TargetFrameworks>net40;net461</TargetFrameworks>
 		<AssemblyName>ManagedBass.Memory</AssemblyName>
 		<OutputPath>..\distribution\</OutputPath>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Version>0.0.1</Version>
 		<Platforms>AnyCPU</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<IncludeSymbols>true</IncludeSymbols>
+		<RepositoryUrl>https://github.com/aidan-g/BASS_MEMORY.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
