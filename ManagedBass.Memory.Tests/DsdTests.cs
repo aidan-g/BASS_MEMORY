@@ -32,7 +32,8 @@ namespace ManagedBass.Memory.Tests
                 }
 
                 Assert.AreEqual(length, Bass.ChannelGetLength(sourceChannel));
-                Assert.IsTrue(Bass.ChannelSetPosition(sourceChannel, length));
+                Assert.IsTrue(Bass.ChannelSetPosition(sourceChannel, length - 1));
+                Assert.IsTrue(Bass.ChannelSetPosition(sourceChannel, length, PositionFlags.Bytes | PositionFlags.DecodeTo));
                 Assert.AreEqual(length, Bass.ChannelGetPosition(sourceChannel));
                 Assert.IsTrue(Bass.StreamFree(sourceChannel));
             }

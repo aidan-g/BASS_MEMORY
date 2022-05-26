@@ -61,7 +61,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="ManagedBass.Memory.targets" PackagePath="build">
+		<None Include="ManagedBass.Memory.targets" PackagePath="build">
 			<pack>true</pack>
 		</None>
 	</ItemGroup>
