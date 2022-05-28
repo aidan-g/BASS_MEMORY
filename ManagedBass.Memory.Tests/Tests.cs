@@ -9,10 +9,11 @@ namespace ManagedBass.Memory.Tests
     {
         private static readonly string Location = Path.GetDirectoryName(typeof(Tests).Assembly.Location);
 
+        [Explicit]
         [TestCase("01 Botanical Dimensions.m4a", 49062136, BassFlags.Default)]
-        [TestCase("01 Botanical Dimensions.m4a", 49062136, BassFlags.Float)]
+        [TestCase("01 Botanical Dimensions.m4a", 98124272, BassFlags.Float)]
         [TestCase("02 Outer Shpongolia.m4a", 26975092, BassFlags.Default)]
-        [TestCase("02 Outer Shpongolia.m4a", 26975092, BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", 53950184, BassFlags.Float)]
         public void Test001(string fileName, long length, BassFlags flags)
         {
             if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
@@ -54,10 +55,11 @@ namespace ManagedBass.Memory.Tests
             }
         }
 
+        [Explicit]
         [TestCase("01 Botanical Dimensions.m4a", 49062136, BassFlags.Default)]
-        [TestCase("01 Botanical Dimensions.m4a", 49062136, BassFlags.Float)]
+        [TestCase("01 Botanical Dimensions.m4a", 98124272, BassFlags.Float)]
         [TestCase("02 Outer Shpongolia.m4a", 26975092, BassFlags.Default)]
-        [TestCase("02 Outer Shpongolia.m4a", 26975092, BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", 53950184, BassFlags.Float)]
         public void Test002(string fileName, long length, BassFlags flags)
         {
             if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
@@ -71,7 +73,7 @@ namespace ManagedBass.Memory.Tests
 
             try
             {
-                var sourceChannel = BassMemory.CreateStream(Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode));
+                var sourceChannel = BassMemory.CreateStream(Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode), Flags: flags);
                 if (sourceChannel == 0)
                 {
                     Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
