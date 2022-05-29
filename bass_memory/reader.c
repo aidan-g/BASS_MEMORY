@@ -102,7 +102,8 @@ BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const s
 }
 
 BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER* const buffer) {
-	size_t length;
+	DWORD length;
+	BOOL eof = FALSE;
 	BYTE* const stream_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!stream_buffer) {
 #if _DEBUG
@@ -112,20 +113,41 @@ BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER*
 	}
 	do {
 		length = BASS_ChannelGetData(handle, stream_buffer, BUFFER_BLOCK_SIZE);
-		if (length == BASS_STREAMPROC_END || length == BASS_ERROR_UNKNOWN || length <= 0) {
-			free(stream_buffer);
-			return TRUE;
+		if ((length & BASS_STREAMPROC_END) == BASS_STREAMPROC_END) {
+#if _DEBUG
+			printf("Stream ended.");
+#endif
+			length &= ~BASS_STREAMPROC_END;
+			eof = TRUE;
+		}
+		else if (length <= 0) {
+			length = 0;
+			eof = TRUE;
+		}
+		if (length > BUFFER_BLOCK_SIZE) {
+#if _DEBUG
+			printf("BASS_ChannelGetData returned something weird, ignoring it.");
+#endif
+			length = 0;
+			eof = TRUE;
 		}
 		if (position + length > buffer->length) {
 #if _DEBUG
 			printf("Buffer capacity exceeded.");
 #endif
-			free(stream_buffer);
-			return TRUE;
+			length = (DWORD)(buffer->length - position);
+			eof = TRUE;
 		}
-		buffer_write(buffer, position, length, stream_buffer);
-		position += length;
+		if (length > 0) {
+			buffer_write(buffer, position, length, stream_buffer);
+			position += length;
+		}
+		if (eof) {
+			break;
+		}
 	} while (TRUE);
+	free(stream_buffer);
+	return TRUE;
 }
 
 BUFFER* read_stream_buffer(const wchar_t* const file, const WAVE_HEADER* const wave_header, const HSTREAM handle, const size_t offset, const size_t length) {

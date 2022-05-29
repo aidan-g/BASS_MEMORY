@@ -87,6 +87,11 @@ size_t buffer_read_segment(const BUFFER* const buffer, const size_t position, co
 }
 
 void buffer_read(const BUFFER* const buffer, size_t position, const size_t length, BYTE* const data) {
+#if _DEBUG
+	if (position + length > buffer->length) {
+		printf("Buffer capacity exceeded.");
+	}
+#endif
 	size_t segment_position;
 	size_t segment_offset;
 	buffer_position(position, &segment_position, &segment_offset);
@@ -120,6 +125,11 @@ size_t buffer_write_segment(const BUFFER* const buffer, const size_t position, c
 }
 
 void buffer_write(const BUFFER* const buffer, size_t position, const size_t length, const BYTE* const data) {
+#if _DEBUG
+	if (position + length > buffer->length) {
+		printf("Buffer capacity exceeded.");
+	}
+#endif
 	size_t segment_position;
 	size_t segment_offset;
 	buffer_position(position, &segment_position, &segment_offset);
