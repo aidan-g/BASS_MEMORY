@@ -47,7 +47,7 @@ HSTREAM BASSMEMORYDEF(_BASS_DSD_StreamCreateFileUser)(DWORD system, DWORD flags,
 HSTREAM BASSMEMORYDEF(BASS_MEMORY_DSD_StreamCreateFile)(BOOL mem, const void* file, QWORD offset, QWORD length, DWORD flags) {
 	MEMORY_STREAM* stream;
 	BUFFER* buffer;
-	buffer = read_file_buffer((const wchar_t*)file, offset, length);
+	buffer = read_file_buffer((const wchar_t*)file, (size_t)offset, (size_t)length);
 	if (buffer) {
 		stream = memory_stream_create((const wchar_t*)file, buffer, &_BASS_DSD_StreamCreateFileUser, flags);
 		if (stream) {

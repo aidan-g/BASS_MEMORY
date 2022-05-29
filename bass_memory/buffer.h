@@ -3,23 +3,21 @@
 
 #include "../bass/bass.h"
 
-#define BUFFER_BLOCK_SIZE 10000000
+typedef struct {
+	BYTE* data;
+	size_t length;
+} BUFFER_SEGMENT;
 
 typedef struct {
-	void* data;
-	DWORD length;
-} SEGMENT;
-
-typedef struct {
-	SEGMENT* segments;
-	QWORD length;
+	BUFFER_SEGMENT* segments;
+	size_t length;
 } BUFFER;
 
-BUFFER* buffer_create(QWORD size);
+BUFFER* buffer_create(const size_t length);
 
-void buffer_read(const BUFFER* buffer, QWORD position, QWORD length, void* data);
+void buffer_read(const BUFFER* const buffer, size_t position, const size_t length, BYTE* const data);
 
-void buffer_write(const BUFFER* buffer, QWORD position, QWORD length, const void* data);
+void buffer_write(const BUFFER* const buffer, size_t position, const size_t length, const BYTE* const data);
 
 void buffer_free(BUFFER* buffer);
 

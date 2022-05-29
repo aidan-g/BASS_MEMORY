@@ -1,6 +1,6 @@
 #include "wave_header.h"
 
-BOOL create_wave_header(HSTREAM handle, WAVE_HEADER* header) {
+BOOL create_wave_header(const HSTREAM handle, WAVE_HEADER* const header) {
 	BASS_CHANNELINFO info;
 	QWORD length;
 	QWORD size;

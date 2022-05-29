@@ -2,8 +2,10 @@
 #include "reader.h"
 #include "cache.h"
 
-QWORD get_file_length(FILE* file_handle) {
-	QWORD length;
+#define BUFFER_BLOCK_SIZE 10000000
+
+size_t get_file_length(FILE* file_handle) {
+	size_t length;
 	if (fseek(file_handle, 0L, SEEK_END) != 0) {
 #if _DEBUG
 		char error[256];
@@ -24,9 +26,9 @@ QWORD get_file_length(FILE* file_handle) {
 	return length;
 }
 
-BOOL populate_file_buffer(FILE* file_handle, QWORD position, const BUFFER* buffer) {
-	QWORD length;
-	void* file_buffer = malloc(BUFFER_BLOCK_SIZE);
+BOOL populate_file_buffer(FILE* file_handle, size_t position, const BUFFER* const buffer) {
+	size_t length;
+	BYTE* const file_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!file_buffer) {
 #if _DEBUG
 		printf("Could not allocate temp buffer.\n");
@@ -60,9 +62,9 @@ BOOL populate_file_buffer(FILE* file_handle, QWORD position, const BUFFER* buffe
 	} while (TRUE);
 }
 
-BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
+BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const size_t length) {
 	BUFFER* buffer;
-	QWORD file_length;
+	size_t file_length;
 	FILE* file_handle;
 	if (cache_acquire(file, &buffer)) {
 		return buffer;
@@ -99,9 +101,9 @@ BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 	return buffer;
 }
 
-BOOL populate_stream_buffer(HSTREAM handle, QWORD position, const BUFFER* buffer) {
-	DWORD length;
-	void* stream_buffer = malloc(BUFFER_BLOCK_SIZE);
+BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER* const buffer) {
+	size_t length;
+	BYTE* const stream_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!stream_buffer) {
 #if _DEBUG
 		printf("Could not allocate temp buffer.\n");
@@ -126,13 +128,13 @@ BOOL populate_stream_buffer(HSTREAM handle, QWORD position, const BUFFER* buffer
 	} while (TRUE);
 }
 
-BUFFER* read_stream_buffer(const wchar_t* file, WAVE_HEADER wave_header, HSTREAM handle, QWORD offset, QWORD length) {
+BUFFER* read_stream_buffer(const wchar_t* const file, const WAVE_HEADER* const wave_header, const HSTREAM handle, const size_t offset, const size_t length) {
 	BUFFER* buffer;
-	QWORD stream_length;
+	size_t stream_length;
 	if (cache_acquire(file, &buffer)) {
 		return buffer;
 	}
-	stream_length = BASS_ChannelGetLength(handle, BASS_POS_BYTE);
+	stream_length = (size_t)BASS_ChannelGetLength(handle, BASS_POS_BYTE);
 	if (stream_length == -1) {
 #if _DEBUG
 		printf("Could not determine stream length.\n");
@@ -142,7 +144,7 @@ BUFFER* read_stream_buffer(const wchar_t* file, WAVE_HEADER wave_header, HSTREAM
 	else {
 		buffer = buffer_create(sizeof(WAVE_HEADER) + stream_length);
 		if (buffer) {
-			buffer_write(buffer, 0, sizeof(WAVE_HEADER), &wave_header);
+			buffer_write(buffer, 0, sizeof(WAVE_HEADER), (BYTE*)wave_header);
 			if (!populate_stream_buffer(handle, sizeof(WAVE_HEADER), buffer)) {
 				buffer_free(buffer);
 				buffer = NULL;

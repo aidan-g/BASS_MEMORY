@@ -6,7 +6,7 @@
 #include "cache.h"
 
 void CALLBACK memory_stream_close(void* user) {
-	MEMORY_STREAM* stream = user;
+	MEMORY_STREAM* const stream = user;
 	if (cache_release(stream->file)) {
 #if _DEBUG
 		printf("The last handle to buffer \"%s\" was released, freeing it.\n", stream->file);
@@ -18,13 +18,13 @@ void CALLBACK memory_stream_close(void* user) {
 }
 
 QWORD CALLBACK memory_stream_length(void* user) {
-	MEMORY_STREAM* stream = user;
+	MEMORY_STREAM* const stream = user;
 	return stream->buffer->length;
 }
 
 DWORD CALLBACK memory_stream_read(void* buffer, DWORD length, void* user) {
-	MEMORY_STREAM* stream = user;
-	QWORD result = stream->buffer->length - stream->position;
+	MEMORY_STREAM* const stream = user;
+	size_t result = stream->buffer->length - stream->position;
 	if (result >= length) {
 		result = length;
 	}
@@ -39,9 +39,9 @@ DWORD CALLBACK memory_stream_read(void* buffer, DWORD length, void* user) {
 }
 
 BOOL CALLBACK memory_stream_seek(QWORD offset, void* user) {
-	MEMORY_STREAM* stream = user;
+	MEMORY_STREAM* const stream = user;
 	if (offset >= 0 && offset <= stream->buffer->length) {
-		stream->position = offset;
+		stream->position = (size_t)offset;
 		return TRUE;
 	}
 #if _DEBUG
@@ -57,8 +57,8 @@ const BASS_FILEPROCS memory_stream_procs = {
 	&memory_stream_seek
 };
 
-MEMORY_STREAM* memory_stream_create(const wchar_t* file, BUFFER* buffer, MEMORY_STREAM_HANDLER* handler, DWORD flags) {
-	MEMORY_STREAM* stream = calloc(sizeof(MEMORY_STREAM), 1);
+MEMORY_STREAM* memory_stream_create(const wchar_t* const file, BUFFER* const buffer, MEMORY_STREAM_HANDLER* handler, const DWORD flags) {
+	MEMORY_STREAM* const stream = calloc(sizeof(MEMORY_STREAM), 1);
 	if (!stream) {
 #if _DEBUG
 		printf("Failed to allocate stream.\n");

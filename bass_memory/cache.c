@@ -10,7 +10,7 @@ typedef struct {
 
 static ENTRY entries[ENTRIES] = { 0 };
 
-BOOL cache_entry(const wchar_t* file, DWORD* const index) {
+BOOL cache_entry(const wchar_t* const file, DWORD* const index) {
 	DWORD position;
 	for (position = 0; position < ENTRIES; position++) {
 		if (entries[position].file && wcscmp(file, entries[position].file) == 0) {
@@ -21,7 +21,7 @@ BOOL cache_entry(const wchar_t* file, DWORD* const index) {
 	return FALSE;
 }
 
-BOOL cache_add(const wchar_t* file, const BUFFER* buffer) {
+BOOL cache_add(const wchar_t* const file, const BUFFER* const buffer) {
 	DWORD position;
 	if (cache_entry(file, &position)) {
 		//Already exists.
@@ -42,7 +42,7 @@ BOOL cache_add(const wchar_t* file, const BUFFER* buffer) {
 	return FALSE;
 }
 
-BOOL cache_acquire(const wchar_t* file, const BUFFER** buffer) {
+BOOL cache_acquire(const wchar_t* const file, const BUFFER** buffer) {
 	DWORD position;
 	if (!cache_entry(file, &position)) {
 		//Doesn't exist.
@@ -54,7 +54,7 @@ BOOL cache_acquire(const wchar_t* file, const BUFFER** buffer) {
 	return TRUE;
 }
 
-BOOL cache_release(const wchar_t* file) {
+BOOL cache_release(const wchar_t* const file) {
 	DWORD position;
 	if (!cache_entry(file, &position)) {
 		//Doesn't exist.

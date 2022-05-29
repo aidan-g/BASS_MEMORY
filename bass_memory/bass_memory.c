@@ -1,6 +1,4 @@
-#ifdef _DEBUG
 #include <stdio.h>
-#endif
 
 #include "bass_memory.h"
 #include "cache.h"
@@ -41,7 +39,7 @@ BOOL BASSMEMORYDEF(BASS_MEMORY_Free)() {
 HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreateFile)(BOOL mem, const void* file, QWORD offset, QWORD length, DWORD flags) {
 	MEMORY_STREAM* stream;
 	BUFFER* buffer;
-	buffer = read_file_buffer((const wchar_t*)file, offset, length);
+	buffer = read_file_buffer((const wchar_t*)file, (size_t)offset, (size_t)length);
 	if (buffer) {
 		stream = memory_stream_create((const wchar_t*)file, buffer, &BASS_StreamCreateFileUser, flags);
 		if (stream) {
@@ -57,8 +55,8 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QW
 	wchar_t file[MAX_PATH + 1];
 	WAVE_HEADER wave_header;
 	if (create_wave_header(handle, &wave_header)) {
-		swprintf_s(file, sizeof(file), L"%u.wav", handle);
-		buffer = read_stream_buffer((const wchar_t*)file, wave_header, handle, offset, length);
+		swprintf_s(file, sizeof(file), L"%d.wav", abs(handle));
+		buffer = read_stream_buffer((const wchar_t*)file, &wave_header, handle, (size_t)offset, (size_t)length);
 		if (buffer) {
 			stream = memory_stream_create((const wchar_t*)file, buffer, &BASS_StreamCreateFileUser, flags);
 			if (stream) {
