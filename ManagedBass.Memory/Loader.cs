@@ -23,7 +23,15 @@ namespace ManagedBass.Memory
             {
                 fileName = Path.Combine(FolderName, fileName);
             }
-            module = Handles.GetOrAdd(fileName, key => LoadLibrary(fileName));
+            module = Handles.GetOrAdd(fileName, key =>
+            {
+                var handle = GetModuleHandle(Path.GetFileName(fileName));
+                if (IntPtr.Zero.Equals(handle))
+                {
+                    handle = LoadLibrary(fileName);
+                }
+                return handle;
+            });
             if (IntPtr.Zero.Equals(module))
             {
                 return false;
@@ -45,10 +53,13 @@ namespace ManagedBass.Memory
             return FreeLibrary(module);
         }
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-        public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string lpFileName);
+
+        [DllImport("kernel32.dll")]
         public static extern bool FreeLibrary(IntPtr hModule);
     }
 }
