@@ -1,20 +1,16 @@
 #include "../bass/bass.h"
+#include "../bass/bass_addon.h"
 
 #ifndef BASSMEMORYDEF
 #define BASSMEMORYDEF(f) WINAPI f
 #endif
 
-__declspec(dllexport)
-BOOL BASSMEMORYDEF(BASS_MEMORY_Init)();
+BOOL BASSMEMORYDEF(DllMain)(HANDLE dll, DWORD reason, LPVOID reserved);
 
-__declspec(dllexport)
-BOOL BASSMEMORYDEF(BASS_MEMORY_Free)();
+const VOID* BASSMEMORYDEF(BASSplugin)(DWORD face);
 
-__declspec(dllexport)
 HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreateFile)(BOOL mem, const void* file, QWORD offset, QWORD length, DWORD flags);
 
-__declspec(dllexport)
 HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QWORD length, DWORD flags);
 
-__declspec(dllexport)
 QWORD BASSMEMORYDEF(BASS_MEMORY_Usage)();

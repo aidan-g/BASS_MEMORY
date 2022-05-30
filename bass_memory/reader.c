@@ -147,6 +147,11 @@ BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER*
 		}
 	} while (TRUE);
 	free(stream_buffer);
+#if _DEBUG
+	if (position < buffer->length) {
+		printf("Stream ended before the buffer was populated.");
+	}
+#endif
 	return TRUE;
 }
 

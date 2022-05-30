@@ -9,7 +9,8 @@
 #include "../bass_memory/memory_stream.h"
 #include "../bass_memory/reader.h"
 
-BOOL is_initialized = FALSE;
+//2.4.0.0
+#define BASSDTSVERSION 0x02040000
 
 //I have no idea how to prevent linking against this routine in msvcrt.
 //It doesn't exist on Windows XP.
@@ -18,26 +19,27 @@ int _except_handler4_common() {
 	return 0;
 }
 
-BOOL BASSMEMORYDEF(BASS_MEMORY_DSD_Init)() {
-	if (is_initialized) {
-		return FALSE;
+static const BASS_PLUGININFO plugin_info = { BASSDTSVERSION, 0, NULL };
+
+BOOL BASSMEMORYDEF(DllMain)(HANDLE dll, DWORD reason, LPVOID reserved) {
+	switch (reason) {
+	case DLL_PROCESS_ATTACH:
+		DisableThreadLibraryCalls((HMODULE)dll);
+		if (HIWORD(BASS_GetVersion()) != BASSVERSION || !GetBassFunc()) {
+			MessageBoxA(0, "Incorrect BASS.DLL version (" BASSVERSIONTEXT " is required)", "BASS", MB_ICONERROR | MB_OK);
+			return FALSE;
+		}
+		break;
 	}
-	is_initialized = TRUE;
-#if _DEBUG
-	printf("BASS MEMORY DSD initialized.\n");
-#endif
 	return TRUE;
 }
 
-BOOL BASSMEMORYDEF(BASS_MEMORY_DSD_Free)() {
-	if (!is_initialized) {
-		return FALSE;
+const VOID* BASSMEMORYDEF(BASSplugin)(DWORD face) {
+	switch (face) {
+	case BASSPLUGIN_INFO:
+		return (void*)&plugin_info;
 	}
-	is_initialized = FALSE;
-#if _DEBUG
-	printf("BASS MEMORY DSD released.\n");
-#endif
-	return TRUE;
+	return NULL;
 }
 
 HSTREAM BASSMEMORYDEF(_BASS_DSD_StreamCreateFileUser)(DWORD system, DWORD flags, const BASS_FILEPROCS* procs, void* user) {

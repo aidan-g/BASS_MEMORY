@@ -1,0 +1,6 @@
+LIBRARY bass_memory_dsd
+VERSION 2.4
+EXPORTS
+BASSplugin
+BASS_MEMORY_DSD_StreamCreateFile
+BASS_MEMORY_DSD_Usage

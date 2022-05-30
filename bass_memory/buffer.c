@@ -18,13 +18,13 @@ void buffer_position(const size_t position, size_t* const segment_position, size
 	*segment_offset = position % BUFFER_BLOCK_SIZE;
 }
 
-BOOL buffer_alloc(BUFFER* const buffer, size_t size) {
+BOOL buffer_alloc(BUFFER* const buffer, const size_t size) {
+	size_t remaining = size;
 	size_t segment_position;
 	size_t segment_count;
 	size_t segment_length;
 	buffer_size(size, &segment_count);
 	buffer->segments = calloc(sizeof(BUFFER_SEGMENT), segment_count);
-	buffer->length = size;
 	if (!buffer->segments) {
 #if _DEBUG
 		printf("Could not allocate buffer segments.\n");
@@ -32,22 +32,30 @@ BOOL buffer_alloc(BUFFER* const buffer, size_t size) {
 		return FALSE;
 	}
 	for (segment_position = 0; segment_position < segment_count; segment_position++) {
-		if (size > BUFFER_BLOCK_SIZE) {
+		if (remaining > BUFFER_BLOCK_SIZE) {
 			segment_length = BUFFER_BLOCK_SIZE;
 		}
 		else {
-			segment_length = size;
+			segment_length = remaining;
 		}
 		buffer->segments[segment_position].data = malloc(segment_length);
 		if (!buffer->segments[segment_position].data) {
 #if _DEBUG
 			printf("Could not allocate buffer segment.\n");
 #endif
-			return FALSE;
+			break;
 		}
 		buffer->segments[segment_position].length = segment_length;
-		size -= segment_length;
+		remaining -= segment_length;
 	}
+	if (remaining) {
+#if _DEBUG
+		printf("Buffer was partially allocated.\n");
+#endif
+		buffer->length = size - remaining;
+		return FALSE;
+	}
+	buffer->length = size;
 	return TRUE;
 }
 
@@ -64,7 +72,7 @@ BUFFER* buffer_create(const size_t size) {
 
 size_t buffer_read_segment(const BUFFER* const buffer, const size_t position, const size_t length, size_t* const segment_position, size_t* const segment_offset, BYTE* const data) {
 	size_t remaining = length - position;
-	size_t segment_remaining = BUFFER_BLOCK_SIZE - *segment_offset;
+	size_t segment_remaining = buffer->segments[*segment_position].length - *segment_offset;
 	if (segment_remaining > remaining) {
 		memcpy(
 			(BYTE*)data + position,
@@ -87,11 +95,12 @@ size_t buffer_read_segment(const BUFFER* const buffer, const size_t position, co
 }
 
 void buffer_read(const BUFFER* const buffer, size_t position, const size_t length, BYTE* const data) {
-#if _DEBUG
 	if (position + length > buffer->length) {
+#if _DEBUG
 		printf("Buffer capacity exceeded.");
-	}
 #endif
+		return;
+	}
 	size_t segment_position;
 	size_t segment_offset;
 	buffer_position(position, &segment_position, &segment_offset);
@@ -102,7 +111,7 @@ void buffer_read(const BUFFER* const buffer, size_t position, const size_t lengt
 
 size_t buffer_write_segment(const BUFFER* const buffer, const size_t position, const size_t length, size_t* const segment_position, size_t* const segment_offset, const BYTE* const data) {
 	size_t remaining = length - position;
-	size_t segment_remaining = BUFFER_BLOCK_SIZE - *segment_offset;
+	size_t segment_remaining = buffer->segments[*segment_position].length - *segment_offset;
 	if (segment_remaining > remaining) {
 		memcpy(
 			buffer->segments[*segment_position].data + *segment_offset,
@@ -125,11 +134,12 @@ size_t buffer_write_segment(const BUFFER* const buffer, const size_t position, c
 }
 
 void buffer_write(const BUFFER* const buffer, size_t position, const size_t length, const BYTE* const data) {
-#if _DEBUG
 	if (position + length > buffer->length) {
+#if _DEBUG
 		printf("Buffer capacity exceeded.");
-	}
 #endif
+		return;
+	}
 	size_t segment_position;
 	size_t segment_offset;
 	buffer_position(position, &segment_position, &segment_offset);

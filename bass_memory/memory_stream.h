@@ -7,7 +7,7 @@ typedef struct {
 	HSTREAM handle;
 } MEMORY_STREAM;
 
-typedef HSTREAM(CALLBACK MEMORY_STREAM_HANDLER)(DWORD system, DWORD flags, const BASS_FILEPROCS *proc, void *user);
+typedef HSTREAM(CALLBACK MEMORY_STREAM_HANDLER)(DWORD system, DWORD flags, const BASS_FILEPROCS* proc, void* user);
 
 MEMORY_STREAM* memory_stream_create(const wchar_t* const file, BUFFER* const buffer, MEMORY_STREAM_HANDLER* handler, const DWORD flags);
 

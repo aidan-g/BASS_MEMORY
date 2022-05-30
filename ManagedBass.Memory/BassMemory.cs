@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace ManagedBass.Memory
@@ -7,74 +8,37 @@ namespace ManagedBass.Memory
     {
         const string DllName = "bass_memory";
 
-        static BassMemory()
+        public static int Module = 0;
+
+        public static bool Load(string folderName = null)
         {
-            Module = IntPtr.Zero;
+            if (Module == 0)
+            {
+                var fileName = default(string);
+                if (!string.IsNullOrEmpty(folderName))
+                {
+                    fileName = Path.Combine(folderName, DllName);
+                }
+                else
+                {
+                    fileName = Path.Combine(Loader.FolderName, DllName);
+                }
+                Module = Bass.PluginLoad(string.Format("{0}.{1}", fileName, Loader.Extension));
+            }
+            return Module != 0;
         }
 
-        public static IntPtr Module;
-
-        /// <summary>
-        /// Load the library.
-        /// </summary>
-        /// <returns></returns>
-        public static bool Load()
-        {
-            return Loader.Load(DllName, out Module);
-        }
-
-        /// <summary>
-        /// Unload the library.
-        /// </summary>
-        /// <returns></returns>
         public static bool Unload()
         {
-            try
+            if (Module != 0)
             {
-                return Loader.Free(DllName);
-            }
-            finally
-            {
-                Module = IntPtr.Zero;
-            }
-        }
-
-        [DllImport(DllName)]
-        static extern bool BASS_MEMORY_Init();
-
-        /// <summary>
-        /// Initialize.
-        /// </summary>
-        /// <returns></returns>
-        public static bool Init()
-        {
-            try
-            {
-                return BASS_MEMORY_Init();
-            }
-            catch (DllNotFoundException)
-            {
-                if (IntPtr.Zero.Equals(Module))
+                if (!Bass.PluginFree(Module))
                 {
-                    if (Load())
-                    {
-                        return BASS_MEMORY_Init();
-                    }
+                    return false;
                 }
-                return false;
+                Module = 0;
             }
-        }
-
-        [DllImport(DllName)]
-        static extern bool BASS_MEMORY_Free();
-
-        /// <summary>
-        /// Free.
-        /// </summary>
-        /// <returns></returns>
-        public static bool Free()
-        {
-            return BASS_MEMORY_Free();
+            return true;
         }
 
         [DllImport(DllName, CharSet = CharSet.Unicode)]
@@ -105,74 +69,37 @@ namespace ManagedBass.Memory
         {
             const string DllName = "bass_memory_dsd";
 
-            static Dsd()
+            public static int Module = 0;
+
+            public static bool Load(string folderName = null)
             {
-                Module = IntPtr.Zero;
+                if (Module == 0)
+                {
+                    var fileName = default(string);
+                    if (!string.IsNullOrEmpty(folderName))
+                    {
+                        fileName = Path.Combine(folderName, DllName);
+                    }
+                    else
+                    {
+                        fileName = Path.Combine(Loader.FolderName, DllName);
+                    }
+                    Module = Bass.PluginLoad(string.Format("{0}.{1}", fileName, Loader.Extension));
+                }
+                return Module != 0;
             }
 
-            public static IntPtr Module;
-
-            /// <summary>
-            /// Load the library.
-            /// </summary>
-            /// <returns></returns>
-            public static bool Load()
-            {
-                return Loader.Load(DllName, out Module);
-            }
-
-            /// <summary>
-            /// Unload the library.
-            /// </summary>
-            /// <returns></returns>
             public static bool Unload()
             {
-                try
+                if (Module != 0)
                 {
-                    return Loader.Free(DllName);
-                }
-                finally
-                {
-                    Module = IntPtr.Zero;
-                }
-            }
-
-            [DllImport(DllName)]
-            static extern bool BASS_MEMORY_DSD_Init();
-
-            /// <summary>
-            /// Initialize.
-            /// </summary>
-            /// <returns></returns>
-            public static bool Init()
-            {
-                try
-                {
-                    return BASS_MEMORY_DSD_Init();
-                }
-                catch (DllNotFoundException)
-                {
-                    if (IntPtr.Zero.Equals(Module))
+                    if (!Bass.PluginFree(Module))
                     {
-                        if (Load())
-                        {
-                            return BASS_MEMORY_DSD_Init();
-                        }
+                        return false;
                     }
-                    return false;
+                    Module = 0;
                 }
-            }
-
-            [DllImport(DllName)]
-            static extern bool BASS_MEMORY_DSD_Free();
-
-            /// <summary>
-            /// Free.
-            /// </summary>
-            /// <returns></returns>
-            public static bool Free()
-            {
-                return BASS_MEMORY_DSD_Free();
+                return true;
             }
 
             [DllImport(DllName, CharSet = CharSet.Unicode)]

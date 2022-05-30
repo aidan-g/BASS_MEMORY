@@ -9,6 +9,8 @@ namespace ManagedBass.Memory
     {
         public static readonly string FolderName = Path.Combine(Path.GetDirectoryName(typeof(Loader).Assembly.Location), Environment.Is64BitProcess ? "x64" : "x86");
 
+        public static readonly string Extension = "dll";
+
         public static readonly ConcurrentDictionary<string, IntPtr> Handles = new ConcurrentDictionary<string, IntPtr>(StringComparer.OrdinalIgnoreCase);
 
         public static bool Load(string fileName)
