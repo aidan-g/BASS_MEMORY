@@ -72,3 +72,7 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_StreamCreate)(HSTREAM handle, QWORD offset, QW
 QWORD BASSMEMORYDEF(BASS_MEMORY_Usage)() {
 	return cache_size();
 }
+
+VOID BASSMEMORYDEF(BASS_MEMORY_Progress)(VOID(*progress)(BASS_MEMORY_PROGRESS* progress)) {
+	progress_handler(progress);
+}

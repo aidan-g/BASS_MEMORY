@@ -62,3 +62,7 @@ HSTREAM BASSMEMORYDEF(BASS_MEMORY_DSD_StreamCreateFile)(BOOL mem, const void* fi
 QWORD BASSMEMORYDEF(BASS_MEMORY_DSD_Usage)() {
 	return cache_size();
 }
+
+VOID BASSMEMORYDEF(BASS_MEMORY_DSD_Progress)(VOID(*progress)(BASS_MEMORY_PROGRESS* progress)) {
+	progress_handler(progress);
+}

@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ManagedBass.Memory.Tests
 {
@@ -74,6 +76,34 @@ namespace ManagedBass.Memory.Tests
             }
 
             Assert.AreEqual(0, BassMemory.Dsd.Usage());
+        }
+
+        [TestCase("01 Sample.dsf", 14114908, BassFlags.Default)]
+        [TestCase("01 Sample.dsf", 14114908, BassFlags.DSDRaw)]
+        public void Test003(string fileName, long size, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            ProgressHandler.Attach(BassMemory.Dsd.Progress);
+
+            var sourceChannel = BassMemory.Dsd.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            if (sourceChannel == 0)
+            {
+                Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
+            }
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+
+            var events = default(IList<BassMemoryProgress>);
+            Assert.IsTrue(ProgressHandler.Events.TryGetValue(fileName, out events));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.Begin));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Position == size && @event.Length == size && @event.Type == BassMemoryProgressType.Update));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.End));
+
+            ProgressHandler.Detach(BassMemory.Dsd.Progress);
         }
     }
 }

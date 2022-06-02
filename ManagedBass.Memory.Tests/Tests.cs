@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ManagedBass.Memory.Tests
 {
@@ -206,6 +208,64 @@ namespace ManagedBass.Memory.Tests
             Assert.IsTrue(Bass.ChannelSetPosition(sourceChannel, length, PositionFlags.Bytes | PositionFlags.DecodeTo));
             Assert.AreEqual(length, Bass.ChannelGetPosition(sourceChannel));
             Assert.IsTrue(Bass.StreamFree(sourceChannel));
+        }
+
+        [TestCase("01 Botanical Dimensions.m4a", 30547338, BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", 30547338, BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", 18741817, BassFlags.Default)]
+        [TestCase("02 Outer Shpongolia.m4a", 18741817, BassFlags.Float)]
+        public void Test007(string fileName, long size, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            ProgressHandler.Attach(BassMemory.Progress);
+
+            var sourceChannel = BassMemory.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            if (sourceChannel == 0)
+            {
+                Assert.Fail(string.Format("Failed to create source stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError)));
+            }
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+
+            var events = default(IList<BassMemoryProgress>);
+            Assert.IsTrue(ProgressHandler.Events.TryGetValue(fileName, out events));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.Begin));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Position == size && @event.Length == size && @event.Type == BassMemoryProgressType.Update));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.End));
+
+            ProgressHandler.Detach(BassMemory.Progress);
+        }
+
+        [TestCase("01 Botanical Dimensions.m4a", 49062180, BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", 98124316, BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", 26975136, BassFlags.Default)]
+        [TestCase("02 Outer Shpongolia.m4a", 53950228, BassFlags.Float)]
+        public void Test008(string fileName, long size, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            ProgressHandler.Attach(BassMemory.Progress);
+
+            var sourceChannel = Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            var memoryChannel = BassMemory.CreateStream(sourceChannel, Flags: flags | BassFlags.Decode);
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+            Assert.IsTrue(Bass.StreamFree(memoryChannel));
+
+            var events = default(IList<BassMemoryProgress>);
+            Assert.IsTrue(ProgressHandler.Events.TryGetValue(string.Format("{0}.wav", Math.Abs(sourceChannel)), out events));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.Begin));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Position == size && @event.Length == size && @event.Type == BassMemoryProgressType.Update));
+            Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.End));
+
+            ProgressHandler.Detach(BassMemory.Progress);
         }
     }
 }

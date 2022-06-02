@@ -33,6 +33,7 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="cache.h" />
     <ClInclude Include="memory_stream.h" />
+    <ClInclude Include="progress.h" />
     <ClInclude Include="reader.h" />
     <ClInclude Include="wave_header.h" />
   </ItemGroup>
@@ -41,6 +42,7 @@
     <ClCompile Include="buffer.c" />
     <ClCompile Include="cache.c" />
     <ClCompile Include="memory_stream.c" />
+    <ClCompile Include="progress.c" />
     <ClCompile Include="reader.c" />
     <ClCompile Include="wave_header.c" />
   </ItemGroup>

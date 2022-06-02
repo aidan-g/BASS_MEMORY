@@ -65,6 +65,15 @@ namespace ManagedBass.Memory
             return BASS_MEMORY_Usage();
         }
 
+        [DllImport(DllName)]
+        static extern void BASS_MEMORY_Progress(BassMemoryProgressHandler progress);
+
+        public static void Progress(BassMemoryProgressHandler progress)
+        {
+            Handles.Pin(nameof(BASS_MEMORY_Progress), progress);
+            BASS_MEMORY_Progress(progress);
+        }
+
         public class Dsd
         {
             const string DllName = "bass_memory_dsd";
@@ -117,6 +126,57 @@ namespace ManagedBass.Memory
             {
                 return BASS_MEMORY_DSD_Usage();
             }
+
+            [DllImport(DllName)]
+            static extern void BASS_MEMORY_DSD_Progress(BassMemoryProgressHandler progress);
+
+            public static void Progress(BassMemoryProgressHandler progress)
+            {
+                Handles.Pin(nameof(BASS_MEMORY_DSD_Progress), progress);
+                BASS_MEMORY_DSD_Progress(progress);
+            }
         }
     }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct BassMemoryProgress
+    {
+        public const long BEGIN = -1;
+
+        public const long END = -2;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 261)]
+        public string File;
+
+        public long Position;
+
+        public long Length;
+
+        public BassMemoryProgressType Type
+        {
+            get
+            {
+                switch (this.Length)
+                {
+                    case BEGIN:
+                        return BassMemoryProgressType.Begin;
+                    case END:
+                        return BassMemoryProgressType.End;
+                    default:
+                        return BassMemoryProgressType.Update;
+                }
+            }
+        }
+    }
+
+    public enum BassMemoryProgressType : byte
+    {
+        None,
+        Begin,
+        Update,
+        End
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void BassMemoryProgressHandler(ref BassMemoryProgress progress);
 }

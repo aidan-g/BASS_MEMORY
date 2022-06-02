@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "reader.h"
 #include "cache.h"
+#include "progress.h"
 
-#define BUFFER_BLOCK_SIZE 10000000
+#define BUFFER_BLOCK_SIZE 81920
 
 size_t get_file_length(FILE* file_handle) {
 	size_t length;
@@ -26,8 +27,9 @@ size_t get_file_length(FILE* file_handle) {
 	return length;
 }
 
-BOOL populate_file_buffer(FILE* file_handle, size_t position, const BUFFER* const buffer) {
+BOOL populate_file_buffer(const wchar_t* const file, FILE* file_handle, size_t position, const BUFFER* const buffer) {
 	size_t length;
+	BOOL eof = FALSE;
 	BYTE* const file_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!file_buffer) {
 #if _DEBUG
@@ -35,31 +37,45 @@ BOOL populate_file_buffer(FILE* file_handle, size_t position, const BUFFER* cons
 #endif
 		return FALSE;
 	}
+	progress_begin(file);
 	do {
 		length = fread(file_buffer, sizeof(BYTE), BUFFER_BLOCK_SIZE, file_handle);
 		if (ferror(file_handle)) {
 #if _DEBUG
 			char error[256];
 			strerror_s(error, sizeof(error), errno);
-			printf("Error opening file: %s\n", error);
+			printf("Error reading file: %s\n", error);
 #endif
-			free(file_buffer);
-			return FALSE;
+			length = 0;
+			eof = TRUE;
 		}
 		if (!length) {
-			free(file_buffer);
-			return TRUE;
+			eof = TRUE;
 		}
 		if (position + length > buffer->length) {
 #if _DEBUG
 			printf("Buffer capacity exceeded.");
 #endif
-			free(file_buffer);
-			return TRUE;
+			length = (DWORD)(buffer->length - position);
+			eof = TRUE;
 		}
-		buffer_write(buffer, position, length, file_buffer);
-		position += length;
+		if (length > 0) {
+			buffer_write(buffer, position, length, file_buffer);
+			position += length;
+			progress_update(file, position, buffer->length);
+		}
+		if (eof) {
+			break;
+		}
 	} while (TRUE);
+	free(file_buffer);
+#if _DEBUG
+	if (position < buffer->length) {
+		printf("File ended before the buffer was populated.");
+	}
+#endif
+	progress_end(file);
+	return TRUE;
 }
 
 BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const size_t length) {
@@ -88,7 +104,7 @@ BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const s
 	else {
 		buffer = buffer_create(file_length);
 		if (buffer) {
-			if (!populate_file_buffer(file_handle, 0, buffer)) {
+			if (!populate_file_buffer(file, file_handle, 0, buffer)) {
 				buffer_free(buffer);
 				buffer = NULL;
 			}
@@ -101,7 +117,7 @@ BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const s
 	return buffer;
 }
 
-BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER* const buffer) {
+BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, size_t position, const BUFFER* const buffer) {
 	DWORD length;
 	BOOL eof = FALSE;
 	BYTE* const stream_buffer = malloc(BUFFER_BLOCK_SIZE);
@@ -111,6 +127,7 @@ BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER*
 #endif
 		return FALSE;
 	}
+	progress_begin(file);
 	do {
 		length = BASS_ChannelGetData(handle, stream_buffer, BUFFER_BLOCK_SIZE);
 		if ((length & BASS_STREAMPROC_END) == BASS_STREAMPROC_END) {
@@ -141,6 +158,7 @@ BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER*
 		if (length > 0) {
 			buffer_write(buffer, position, length, stream_buffer);
 			position += length;
+			progress_update(file, position, buffer->length);
 		}
 		if (eof) {
 			break;
@@ -152,6 +170,7 @@ BOOL populate_stream_buffer(const HSTREAM handle, size_t position, const BUFFER*
 		printf("Stream ended before the buffer was populated.");
 	}
 #endif
+	progress_end(file);
 	return TRUE;
 }
 
@@ -172,7 +191,7 @@ BUFFER* read_stream_buffer(const wchar_t* const file, const WAVE_HEADER* const w
 		buffer = buffer_create(sizeof(WAVE_HEADER) + stream_length);
 		if (buffer) {
 			buffer_write(buffer, 0, sizeof(WAVE_HEADER), (BYTE*)wave_header);
-			if (!populate_stream_buffer(handle, sizeof(WAVE_HEADER), buffer)) {
+			if (!populate_stream_buffer(file, handle, sizeof(WAVE_HEADER), buffer)) {
 				buffer_free(buffer);
 				buffer = NULL;
 			}
