@@ -7,8 +7,8 @@ ManagedBass is required for .NET projects.
 A simple example;
 
 ```c#
+BassMemory.Load()
 Bass.Init();
-BassMemory.Init();
 
 var sourceChannel = BassMemory.CreateStream(fileName);
 Bass.ChannelPlay(sourceChannel);
@@ -19,7 +19,7 @@ while (Bass.ChannelIsActive(sourceChannel) == PlaybackState.Playing)
 }
 
 Bass.StreamFree(sourceChannel);
-BassMemory.Free();
+BassMemory.Unload();
 Bass.Free();
 ```
 
@@ -31,3 +31,24 @@ var memoryChannel = BassMemory.CreateStream(sourceChannel);
 ```
 
 Uncompressed channels have a size limit of ~4GB due to the internal WAVE format being 32 bit.
+
+DSD files can also be handled with the `BassMemory.Dsd` type, all functions are duplicated there.
+
+Buffering progress can be monitored with the `BassMemory.Progress` callback:
+
+```c#
+//Set this flag to cancel stream creation.
+var cancel = false;
+
+BassMemory.Progress((ref BassMemoryProgress progress) =>
+{
+	var percent = ((float)progress.Position / progress.Length) * 100;
+
+	//Update the UI.
+	...
+
+	progress.Cancel = cancel;
+});
+
+var sourceChannel = BassMemory.CreateStream(fileName);
+```
