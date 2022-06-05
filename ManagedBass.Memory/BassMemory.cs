@@ -152,6 +152,8 @@ namespace ManagedBass.Memory
 
         public long Length;
 
+        public bool Cancel;
+
         public BassMemoryProgressType Type
         {
             get

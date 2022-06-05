@@ -107,8 +107,8 @@ namespace ManagedBass.Memory.Tests
             ProgressHandler.Detach(BassMemory.Dsd.Progress);
         }
 
-        [TestCase("01 Sample.dsf",  BassFlags.Default)]
-        [TestCase("01 Sample.dsf",  BassFlags.DSDRaw)]
+        [TestCase("01 Sample.dsf", BassFlags.Default)]
+        [TestCase("01 Sample.dsf", BassFlags.DSDRaw)]
         public void Test004(string fileName, BassFlags flags)
         {
             if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
@@ -126,6 +126,24 @@ namespace ManagedBass.Memory.Tests
 
             Assert.IsTrue(Bass.StreamFree(sourceChannel));
             Assert.IsTrue(Bass.StreamFree(memoryChannel));
+        }
+
+        [TestCase("01 Sample.dsf", BassFlags.Default)]
+        [TestCase("01 Sample.dsf", BassFlags.DSDRaw)]
+        public void Test011(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            BassMemory.Dsd.Progress((ref BassMemoryProgress progress) =>
+            {
+                progress.Cancel = true;
+            });
+
+            var sourceChannel = BassMemory.Dsd.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            Assert.AreEqual(0, sourceChannel);
         }
     }
 }

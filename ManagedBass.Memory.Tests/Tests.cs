@@ -315,5 +315,41 @@ namespace ManagedBass.Memory.Tests
             Assert.IsTrue(Bass.StreamFree(sourceChannel));
             Assert.IsTrue(Bass.StreamFree(memoryChannel));
         }
+
+        [TestCase("01 Botanical Dimensions.m4a")]
+        public void Test011(string fileName)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            BassMemory.Progress((ref BassMemoryProgress progress) =>
+            {
+                progress.Cancel = true;
+            });
+
+            var sourceChannel = BassMemory.CreateStream(fileName, Flags: BassFlags.Decode);
+            Assert.AreEqual(0, sourceChannel);
+        }
+
+        [TestCase("01 Botanical Dimensions.m4a")]
+        public void Test012(string fileName)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            var sourceChannel = Bass.CreateStream(fileName, Flags: BassFlags.Decode);
+
+            BassMemory.Progress((ref BassMemoryProgress progress) =>
+            {
+                progress.Cancel = true;
+            });
+
+            var memoryChannel = BassMemory.CreateStream(sourceChannel, Flags: BassFlags.Decode);
+            Assert.AreEqual(0, memoryChannel);
+        }
     }
 }

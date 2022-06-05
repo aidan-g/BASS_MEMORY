@@ -31,6 +31,7 @@ size_t get_file_length(FILE* file_handle) {
 BOOL populate_file_buffer(const wchar_t* const file, FILE* file_handle, size_t position, const BUFFER* const buffer) {
 	size_t length;
 	BOOL eof = FALSE;
+	BOOL cancel = FALSE;
 	BYTE* const file_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!file_buffer) {
 #if _DEBUG
@@ -63,9 +64,12 @@ BOOL populate_file_buffer(const wchar_t* const file, FILE* file_handle, size_t p
 		if (length > 0) {
 			buffer_write(buffer, position, length, file_buffer);
 			position += length;
-			progress_update(file, position, buffer->length);
+			progress_update(file, position, buffer->length, &cancel);
 		}
 		if (eof) {
+			break;
+		}
+		if (cancel) {
 			break;
 		}
 	} while (TRUE);
@@ -76,6 +80,9 @@ BOOL populate_file_buffer(const wchar_t* const file, FILE* file_handle, size_t p
 	}
 #endif
 	progress_end(file);
+	if (cancel) {
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -121,6 +128,7 @@ BUFFER* read_file_buffer(const wchar_t* const file, const size_t offset, const s
 BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, size_t position, const BUFFER* const buffer) {
 	DWORD length;
 	BOOL eof = FALSE;
+	BOOL cancel = FALSE;
 	BYTE* const stream_buffer = malloc(BUFFER_BLOCK_SIZE);
 	if (!stream_buffer) {
 #if _DEBUG
@@ -129,7 +137,7 @@ BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, siz
 		return FALSE;
 	}
 	progress_begin(file);
-	while (BASS_ChannelIsActive(handle) && !eof) {
+	while (BASS_ChannelIsActive(handle) && !eof && !cancel) {
 		length = BASS_ChannelGetData(handle, stream_buffer, BUFFER_BLOCK_SIZE);
 		if (length == BASS_ERROR) {
 #if _DEBUG
@@ -154,7 +162,7 @@ BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, siz
 		if (length > 0) {
 			buffer_write(buffer, position, length, stream_buffer);
 			position += length;
-			progress_update(file, position, buffer->length);
+			progress_update(file, position, buffer->length, &cancel);
 		}
 	}
 	free(stream_buffer);
@@ -164,6 +172,9 @@ BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, siz
 	}
 #endif
 	progress_end(file);
+	if (cancel) {
+		return FALSE;
+	}
 	return TRUE;
 }
 
