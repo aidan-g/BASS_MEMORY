@@ -4,6 +4,7 @@
 #include "progress.h"
 
 #define BUFFER_BLOCK_SIZE 81920
+#define BASS_ERROR 0xFFFFFFFF
 
 size_t get_file_length(FILE* file_handle) {
 	size_t length;
@@ -128,24 +129,19 @@ BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, siz
 		return FALSE;
 	}
 	progress_begin(file);
-	do {
+	while (BASS_ChannelIsActive(handle) && !eof) {
 		length = BASS_ChannelGetData(handle, stream_buffer, BUFFER_BLOCK_SIZE);
+		if (length == BASS_ERROR) {
+#if _DEBUG
+			printf("BASS_ChannelGetData error.");
+#endif
+			length = 0;
+		}
 		if ((length & BASS_STREAMPROC_END) == BASS_STREAMPROC_END) {
 #if _DEBUG
 			printf("Stream ended.");
 #endif
 			length &= ~BASS_STREAMPROC_END;
-			eof = TRUE;
-		}
-		else if (length <= 0) {
-			length = 0;
-			eof = TRUE;
-		}
-		if (length > BUFFER_BLOCK_SIZE) {
-#if _DEBUG
-			printf("BASS_ChannelGetData returned something weird, ignoring it.");
-#endif
-			length = 0;
 			eof = TRUE;
 		}
 		if (position + length > buffer->length) {
@@ -160,10 +156,7 @@ BOOL populate_stream_buffer(const wchar_t* const file, const HSTREAM handle, siz
 			position += length;
 			progress_update(file, position, buffer->length);
 		}
-		if (eof) {
-			break;
-		}
-	} while (TRUE);
+	}
 	free(stream_buffer);
 #if _DEBUG
 	if (position < buffer->length) {

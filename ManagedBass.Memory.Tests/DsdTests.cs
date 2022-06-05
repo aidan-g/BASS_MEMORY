@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using ManagedBass.Dsd;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -104,6 +105,27 @@ namespace ManagedBass.Memory.Tests
             Assert.IsNotNull(events.SingleOrDefault(@event => @event.Type == BassMemoryProgressType.End));
 
             ProgressHandler.Detach(BassMemory.Dsd.Progress);
+        }
+
+        [TestCase("01 Sample.dsf",  BassFlags.Default)]
+        [TestCase("01 Sample.dsf",  BassFlags.DSDRaw)]
+        public void Test004(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            var sourceChannel = BassDsd.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            var memoryChannel = BassMemory.Dsd.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+
+            var expected = ChannelReader.GetHashCode(sourceChannel);
+            var actual = ChannelReader.GetHashCode(memoryChannel);
+
+            Assert.AreEqual(expected, actual);
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+            Assert.IsTrue(Bass.StreamFree(memoryChannel));
         }
     }
 }

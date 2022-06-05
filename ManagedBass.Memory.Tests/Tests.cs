@@ -267,5 +267,53 @@ namespace ManagedBass.Memory.Tests
 
             ProgressHandler.Detach(BassMemory.Progress);
         }
+
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", BassFlags.Default)]
+        [TestCase("02 Outer Shpongolia.m4a", BassFlags.Float)]
+        public void Test009(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            var sourceChannel = Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            var memoryChannel = BassMemory.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+
+            var expected = ChannelReader.GetHashCode(sourceChannel);
+            var actual = ChannelReader.GetHashCode(memoryChannel);
+
+            Assert.AreEqual(expected, actual);
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+            Assert.IsTrue(Bass.StreamFree(memoryChannel));
+        }
+
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Default)]
+        [TestCase("01 Botanical Dimensions.m4a", BassFlags.Float)]
+        [TestCase("02 Outer Shpongolia.m4a", BassFlags.Default)]
+        [TestCase("02 Outer Shpongolia.m4a", BassFlags.Float)]
+        public void Test010(string fileName, BassFlags flags)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                fileName = Path.Combine(Location, "Media", fileName);
+            }
+
+            var sourceChannel = Bass.CreateStream(fileName, Flags: flags | BassFlags.Decode);
+            var memoryChannel = BassMemory.CreateStream(sourceChannel, Flags: flags | BassFlags.Decode);
+
+            Bass.ChannelSetPosition(sourceChannel, 0);
+
+            var expected = ChannelReader.GetHashCode(sourceChannel);
+            var actual = ChannelReader.GetHashCode(memoryChannel);
+
+            Assert.AreEqual(expected, actual);
+
+            Assert.IsTrue(Bass.StreamFree(sourceChannel));
+            Assert.IsTrue(Bass.StreamFree(memoryChannel));
+        }
     }
 }

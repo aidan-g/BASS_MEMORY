@@ -12,11 +12,17 @@
 		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
 			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
 		</Reference>
+		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net40'">
+			<HintPath>..\lib\net40\ManagedBass.Dsd.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
 			<HintPath>..\lib\ManagedBass.dll</HintPath>
+		</Reference>
+		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net461'">
+			<HintPath>..\lib\ManagedBass.Dsd.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -69,5 +75,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\ManagedBass.Memory\ManagedBass.Memory.csproj" />
 	</ItemGroup>
-	
+
 </Project>
